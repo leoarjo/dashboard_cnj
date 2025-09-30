@@ -17,13 +17,29 @@ warnings.filterwarnings('ignore')
 
 load_dotenv()  # Carrega as variáveis do .env
 
+def get_secret(key, default=None):
+    """Busca credencial no st.secrets, se não tiver pega do .env"""
+    try:
+        return st.secrets[key]
+    except Exception:
+        return os.getenv(key, default)
+
 # --- CONFIGURAÇÕES DO BANCO DE DADOS ---
-DB_HOST = os.getenv("DB_HOST")
-DB_PORT = os.getenv("DB_PORT")
-DB_NAME = os.getenv("DB_NAME")
-DB_USER = os.getenv("DB_USER")
-DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_HOST = get_secret("DB_HOST")
+DB_PORT = get_secret("DB_PORT", "5432")
+DB_NAME = get_secret("DB_NAME")
+DB_USER = get_secret("DB_USER")
+DB_PASSWORD = get_secret("DB_PASSWORD")
 # ---------------------------------------
+
+# Conexão
+conn = psycopg2.connect(
+    host=DB_HOST,
+    port=DB_PORT,
+    dbname=DB_NAME,
+    user=DB_USER,
+    password=DB_PASSWORD
+)
 
 # Configuração da página
 st.set_page_config(
